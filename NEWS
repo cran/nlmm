@@ -1,0 +1,16 @@
+Changes in nlmm
+
+=============================================
+
+Version 1.0.0 (August 2, 2019)
+
+- Package nlmm on GitHub
+
+=============================================
+
+Version 1.0.1 (March 21, 2020)
+
+- Bugs fixes
+- Added AIC function
+- Added option for nlminb optimization
+- Package nlmm on CRAN
