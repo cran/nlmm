@@ -5,7 +5,6 @@ importFrom("utils", "packageDescription", "combn", "setTxtProgressBar", "txtProg
 importFrom("lqmm", "theta.z.dim", "is.positive.definite", "make.positive.definite")
 importFrom("Qtools", "logit", "invlogit")
 importFrom("statmod", "gauss.quad.prob")
-import("HI")
 import("MASS")
 import("mvtnorm")
 import("nlme")

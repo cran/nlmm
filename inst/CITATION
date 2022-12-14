@@ -24,13 +24,13 @@ citEntry(
  	author = personList(as.person("Marco Geraci"), as.person("Alessio Farcomeni")),
 	title = "A family of linear mixed-effects models using the generalized {L}aplace distribution",
  	journal = "Statistical Methods in Medical Research",
-	volume = "",
-	number = "",
-	pages = "1--18",
+	volume = "29",
+	number = "9",
+	pages = "2665--2682",
 	year = "2020",
 	textVersion = paste("Geraci M and Farcomeni A (2020).",
 	"A family of linear mixed-effects models using the generalized Laplace distribution.",
-	"Statistical Methods in Medical Research, doi:10.1177/0962280220903763.")
+	"Statistical Methods in Medical Research 29(9), 2665-2682.")
 )
 
 citFooter("A BibTeX entry for LaTeX users is toBibtex(citation('nlmm'))")
