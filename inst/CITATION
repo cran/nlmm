@@ -5,10 +5,10 @@ citHeader("To cite package", sQuote(meta$Package), "in publications use:")
 year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date, perl = TRUE)
 vers <- paste("R package version", meta$Version)
 
-citEntry(
-  entry = "Manual",
+bibentry(
+  bibtype = "Manual",
   title ="nlmm: {G}eneralized {L}aplace {M}ixed-{E}ffects {M}odels",
-  author = personList(as.person("M. Geraci")),
+  author = person(given = "Marco", family = "Geraci"),
   year = year,
   note = vers,
   url = "https://cran.r-project.org/package=nlmm",
@@ -18,10 +18,9 @@ citEntry(
                      vers, ". Available at https://cran.r-project.org/package=nlmm", ".")
 	)
 
-	
-citEntry(
-	entry = "Article",
- 	author = personList(as.person("Marco Geraci"), as.person("Alessio Farcomeni")),
+bibentry(
+	bibtype = "Article",
+ 	author = c(person(given = "Marco", family = "Geraci"), person(given = "Alessio", family = "Farcomeni")),
 	title = "A family of linear mixed-effects models using the generalized {L}aplace distribution",
  	journal = "Statistical Methods in Medical Research",
 	volume = "29",
@@ -32,5 +31,4 @@ citEntry(
 	"A family of linear mixed-effects models using the generalized Laplace distribution.",
 	"Statistical Methods in Medical Research 29(9), 2665-2682.")
 )
-
 citFooter("A BibTeX entry for LaTeX users is toBibtex(citation('nlmm'))")

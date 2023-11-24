@@ -207,7 +207,7 @@ if(sc == "Normal-Normal"){
 	message("Both alphas are fixed to 0. Fitting a standard linear mixed model with 'lme'")
 	reStruct <- list(group = nlme::pdMat(random, pdClass = cov_name))
 	names(reStruct) <- as.character(group)
-	lmeFit <- nlme::lme(fixed = fixed, random = reStruct, weights = weights, data = dataMix, method = "ML", control = lmeControl(opt = control$lmeOpt))
+	lmeFit <- nlme::lme(fixed = fixed, random = reStruct, weights = vf, data = dataMix, method = "ML", control = lmeControl(opt = control$lmeOpt))
 	ans <- lme2nlmm(x = lmeFit, Call = Call, mmf = mmf, mmr = mmr, y = y, revOrder = revOrder, vf = vf, contr = contr, grp = grp, control = control, cov_name = cov_name, mfArgs = mfArgs)
 	return(ans)
 
@@ -216,7 +216,7 @@ if(sc == "Normal-Normal"){
 if(control$lme){
 	reStruct <- list(group = nlme::pdMat(random, pdClass = cov_name))
 	names(reStruct) <- as.character(group)
-	lmeFit <- nlme::lme(fixed = fixed, random = reStruct, weights = weights, data = dataMix, method = control$lmeMethod, control = lmeControl(opt = control$lmeOpt))
+	lmeFit <- nlme::lme(fixed = fixed, random = reStruct, weights = vf, data = dataMix, method = control$lmeMethod, control = lmeControl(opt = control$lmeOpt))
 	theta_x <- as.numeric(lmeFit$coefficients$fixed)
 	theta_z <- as.numeric(coef(lmeFit[[1]]$reStruct)) # log-Cholesky scale
 	theta_w <- as.numeric(coef(lmeFit[[1]]$varStruct)) # numeric(0) if coef is NULL
@@ -269,17 +269,17 @@ if(control$multistart){
 			FIT_ARGS$index <- control$alpha.index
 			
 			if(control$method == "nlminb"){
-				tmp[[k]] <- do.call(nlminb, args = c(list(objective = loglik_alpha_nlmm, start = FIT_ARGS$theta, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+				tmp[[k]] <- do.call(nlminb, args = c(list(objective = loglik_alpha_nlmm, start = FIT_ARGS$theta, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 				names(tmp[[k]])[names(tmp[[k]]) == "objective"] <- "value"
 			} else {
-				tmp[[k]] <- do.call(optim, args = c(list(fn = loglik_alpha_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+				tmp[[k]] <- do.call(optim, args = c(list(fn = loglik_alpha_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 			}
 		} else {
 			if(control$method == "nlminb"){
-				tmp[[k]] <- do.call(nlminb, args = c(list(objective = loglik_nlmm, start = FIT_ARGS$theta, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+				tmp[[k]] <- do.call(nlminb, args = c(list(objective = loglik_nlmm, start = FIT_ARGS$theta, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 				names(tmp[[k]])[names(tmp[[k]]) == "objective"] <- "value"
 			} else {
-				tmp[[k]] <- do.call(optim, args = c(list(fn = loglik_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+				tmp[[k]] <- do.call(optim, args = c(list(fn = loglik_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 			}
 		}
 	}
@@ -290,10 +290,10 @@ if(control$multistart){
 } else {
 	if(control$alpha.index == 9){
 		if(control$method == "nlminb"){
-			fit <- do.call(nlminb, args = c(list(objective = loglik_nlmm, start = FIT_ARGS$theta, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+			fit <- do.call(nlminb, args = c(list(objective = loglik_nlmm, start = FIT_ARGS$theta, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 			names(fit)[names(fit) == "objective"] <- "value"		
 		} else {
-			fit <- do.call(optim, args = c(list(fn = loglik_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+			fit <- do.call(optim, args = c(list(fn = loglik_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 		}
 	} else {
 		sel <- if(control$alpha.index == 0) 1:2 else control$alpha.index
@@ -301,10 +301,10 @@ if(control$multistart){
 		FIT_ARGS$index <- control$alpha.index
 		
 		if(control$method == "nlminb"){
-			fit <- do.call(nlminb, args = c(list(objective = loglik_alpha_nlmm, start = FIT_ARGS$theta, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+			fit <- do.call(nlminb, args = c(list(objective = loglik_alpha_nlmm, start = FIT_ARGS$theta, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 			names(fit)[names(fit) == "objective"] <- "value"
 		} else {
-			fit <- do.call(optim, args = c(list(fn = loglik_alpha_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = 0)), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
+			fit <- do.call(optim, args = c(list(fn = loglik_alpha_nlmm, par = FIT_ARGS$theta, method = control$method, control = list(trace = as.numeric(control$verbose))), FIT_ARGS[-c(match(c("theta"), names(FIT_ARGS)))]))
 		}
 	}
 }
@@ -896,6 +896,8 @@ lme2nlmm <- function(x, Call, mmf, mmr, y, revOrder, vf, contr, grp, control, co
 
 dl <- function(x, mu = 0, sigma = 1, log = FALSE){
 
+stopifnot(sigma > 0)
+
 val <- 1/(sqrt(2)*sigma) * exp(-sqrt(2)/sigma * abs(x - mu))
 
 if(log){
@@ -907,12 +909,47 @@ ans <- val
 return(ans)
 }
 
+
+# CDF of the Laplace
+
+pl <- function(x, mu = 0, sigma = 1, lower.tail = TRUE, log.p = FALSE){
+
+stopifnot(sigma > 0)
+
+val <- ifelse(x < mu, 0.5*exp(sqrt(2)/sigma*(x - mu)), 1 - 0.5*exp(-sqrt(2)/sigma*(x - mu)))
+
+if(!lower.tail) val <- 1 - val
+
+if(log.p) val <- log(val)
+
+return(val)
+}
+
+# quantile of the Laplace
+
+ql <- function(p, mu = 0, sigma = 1, lower.tail = TRUE, log.p = FALSE){
+
+stopifnot(sigma > 0)
+
+if(log.p) p <- exp(p)
+
+val <- ifelse(p < 0.5, mu + sigma/sqrt(2)*log(2*p), mu - sigma/sqrt(2)*log(2*(1-p)))
+
+val[p == 0.5] <- 0
+
+if(!lower.tail) val <- -val
+
+return(val)
+}
+
 # Random generation for the Laplace
 
 rl <- function(n, mu = 0, sigma = 1){
 
 # symmetric Laplace
 # Kotz et al p.18
+
+stopifnot(sigma > 0)
 
 W <- rexp(n, 1)
 N <- rnorm(n, sd = sigma)
@@ -929,17 +966,17 @@ return(val)
 
 # Density of the multivariate asymmetric Laplace
 
-dmal <- function(x, m = rep(0, nrow(sigma)), sigma, log = FALSE){
+dmal <- function(x, mu = rep(0, d), sigma = diag(d), log = FALSE){
 
-n <- length(x)
+d <- length(x)
 x <- as.matrix(x)
-m <- as.matrix(m)
-p <- (2 - n)/2
+mu <- as.matrix(mu)
+p <- (2 - d)/2
 s <- solve(sigma)
 a <- t(x) %*% s %*% x
-b <- t(m) %*% s %*% m
+b <- t(mu) %*% s %*% mu
 
-A <- 2*exp(t(x) %*% s %*% m)/(2*pi)^(n/2)*det(sigma)^(-0.5)
+A <- 2*exp(t(x) %*% s %*% mu)/(2*pi)^(d/2)*det(sigma)^(-0.5)
 B <- (a/(2 + b))^(p/2)
 C <- sqrt(a*(2 + b))
 val <- A*B*besselK(C, p, expon.scaled = FALSE)
@@ -950,15 +987,15 @@ return(as.numeric(val))
 
 # Random generation for the multivariate asymmetric Laplace
 
-rmal <- function(n, m = rep(0, nrow(sigma)), sigma){
+rmal <- function(n, mu, sigma){
 
-# multivariate asymmetric Laplace (symmetric if m = 0)
+# multivariate asymmetric Laplace (symmetric if mu = 0)
 # Kotz et al p.242
 
 W <- rexp(n, 1)
 N <- rmvnorm(n, sigma = sigma)
-m <- matrix(m, nrow = 1)
-val <- kronecker(m, W) + sweep(N, 1, sqrt(W), "*")
+mu <- matrix(mu, nrow = 1)
+val <- kronecker(mu, W) + sweep(N, 1, sqrt(W), "*")
 
 return(val)
 
@@ -968,46 +1005,48 @@ return(val)
 
 # Density of the (symmetric) generalized Laplace
 
-dgl <- function(x, mu = 0, sigma = 1, shape = 1, log = FALSE){
+dgl <- function(x, sigma = 1, shape = 1, log = FALSE){
 
 # symmetric generalized Laplace
 # Kotz et al p.190
-# mu = location
 # sigma = scale
 # variance = shape*sigma^2
 
+stopifnot(shape > 0, sigma > 0)
+
 p <- shape - 1/2
 
-val1 <- sqrt(2)/(sigma^(p + 1)*gamma(shape)*sqrt(pi))
-val2 <- (abs(x - mu)/sqrt(2))^p
-val3 <- besselK(sqrt(2)*abs(x - mu)/sigma, nu = p, expon.scaled = FALSE)
+val1 <- 0.5*log(2) - (p+1)*log(sigma) - log(gamma(shape)) - 0.5*log(pi)
+val2 <- p*log(abs(x)) - p*0.5*log(2)
+val3 <- bessel_lnKnu(x = sqrt(2)*abs(x)/sigma, nu = abs(p))
 
-val <- val1*val2*val3
-if(log) val <- log(val)
+val <- val1 + val2 + val3
+if(!log) val <- exp(val)
 
 return(val)
 }
 
 # CDF of the (symmetric) generalized Laplace
 
-pgl <- function(x, mu = 0, sigma = 1, shape = 1, lower.tail = TRUE, log.p = FALSE){
+pgl <- function(x, sigma = 1, shape = 1, lower.tail = TRUE, log.p = FALSE){
 
 # symmetric generalized Laplace
 # Kotz et al p.190
-# mu = location
 # sigma = scale
 # variance = shape*sigma^2
+
+stopifnot(shape > 0, sigma > 0)
 
 n <- length(x)
 val <- rep(NA, n)
 	
 if(lower.tail){
 	for(i in 1:n){
-		val[i] <- integrate(dgl, lower = -Inf, upper = x[i], mu = mu, sigma = sigma, shape = shape)$value
+		val[i] <- integrate(dgl, lower = -Inf, upper = x[i], sigma = sigma, shape = shape)$value
 	}
 } else {
 	for(i in 1:n){
-		val[i] <- integrate(dgl, lower = x[i], upper = Inf, mu = mu, sigma = sigma, shape = shape)$value
+		val[i] <- integrate(dgl, lower = x[i], upper = Inf, sigma = sigma, shape = shape)$value
 	}
 }
 
@@ -1018,37 +1057,38 @@ return(val)
 
 # quantile of the (symmetric) generalized Laplace
 
-qgl <- function(p, mu = 0, sigma = 1, shape = 1, lower.tail = TRUE, log.p = FALSE){
+qgl <- function(p, sigma = 1, shape = 1, lower.tail = TRUE, log.p = FALSE){
 
 # symmetric generalized Laplace
 # Kotz et al p.190
-# mu = location
 # sigma = scale
 # variance = shape*sigma^2
 
+stopifnot(shape > 0, sigma > 0)
+
 if(log.p) p <- exp(p)
 
-f <- function(x, p, mu, sigma, shape){
-	p - pgl(x, mu = mu, sigma = sigma, shape = shape)
+f <- function(x, p, sigma, shape){
+	p - pgl(x, sigma = sigma, shape = shape)
 }
 
-f2 <- function(x, p, mu, sigma, shape){
-	(p - pgl(x, mu = mu, sigma = sigma, shape = shape))^2
+f2 <- function(x, p, sigma, shape){
+	(p - pgl(x, sigma = sigma, shape = shape))^2
 }
 
 V <- shape*sigma^2
 n <- length(p)
 val <- rep(NA, n)
 for(i in 1:n){
-	ans <- try(uniroot(f, p = p[i], mu = mu, sigma = sigma, shape = shape, interval = c(mu - 20*sqrt(V), mu + 20*sqrt(V)))$root, silent = TRUE)
+	ans <- try(uniroot(f, p = p[i], sigma = sigma, shape = shape, interval = c(-20*sqrt(V), 20*sqrt(V)))$root, silent = TRUE)
 	if(inherits(ans, "try-error")) {
-		ans <- try(optimize(f2, p = p[i], mu = mu, sigma = sigma, shape = shape, interval = c(mu - 20*sqrt(V), mu + 20*sqrt(V)))$minimum, silent = TRUE)
+		ans <- try(optimize(f2, p = p[i], sigma = sigma, shape = shape, interval = c(-20*sqrt(V), 20*sqrt(V)))$minimum, silent = TRUE)
 		if(inherits(ans, "try-error")) ans <- NA
 	}
 	val[i] <- ans
 }
 
-val[p == 0.5] <- mu 
+val[p == 0.5] <- 0
 
 if(!lower.tail) val <- -val
 
@@ -1057,17 +1097,18 @@ return(val)
 
 # Random generation for the (symmetric) generalized Laplace
 
-rgl <- function(n, mu = 0, sigma = 1, shape = 1){
+rgl <- function(n, sigma = 1, shape = 1){
 
 # symmetric generalized Laplace
 # Kotz et al p.190
-# mu = location
 # sigma = scale
 # variance = shape*sigma^2
 
+stopifnot(shape > 0, sigma > 0)
+
 W <- rgamma(n, shape = shape, scale = 1)
 N <- rnorm(n, sd = sigma)
-val <- mu + sqrt(W)*N
+val <- sqrt(W)*N
 
 attr(val, "scale") <- W
 
@@ -1080,13 +1121,14 @@ return(val)
 
 # Density of the (centered) asymmetric multivariate generalized Laplace
 
-dmgl <- function(x, mu = rep(0, n), sigma = diag(n), shape = 1, log = FALSE){
+dmgl <- function(x, mu = rep(0, d), sigma = diag(d), shape = 1, log = FALSE){
 
 # asymmetric multivariate generalized Laplace (symmetric if mu = 0)
 # Kozubowski et al et (2013, Journal of Multivariate Analysis)
 # mu = symmetry
 # sigma = scale
 
+stopifnot(shape > 0)
 
 Q <- function(x, sigma){
 	x <- as.matrix(x)
@@ -1100,20 +1142,27 @@ C <- function(mu, sigma){
 	return(val)
 }
 
-n <- length(x)
+d <- length(x)
 mu <- as.matrix(mu)
 sigma <- as.matrix(sigma)
 x <- as.matrix(x)
-p <- shape - n/2
-k <- sqrt(det(sigma))
-sigma <- solve(sigma)
+p <- shape - d/2
 
-val1 <- 2*exp(crossprod(mu, sigma) %*% x)/((2*pi)^(n/2)*gamma(shape)*k)
-val2 <- (Q(x, sigma)/C(mu, sigma))^p
-val3 <- besselK(Q(x, sigma)*C(mu, sigma), nu = p, expon.scaled = FALSE)
+FLAG <- isTRUE(all.equal(sigma[!diag(d)], rep(0, d*(d-1))))
+if(FLAG){
+	logk <- 0.5*sum(log(diag(sigma)))
+	diag(sigma) <- 1/diag(sigma)
+} else {
+	logk <- 0.5*determinant(sigma, logarithm = TRUE)$modulus
+	sigma <- solve(sigma)
+}
 
-val <- val1*val2*val3
-if(log) val <- log(val)
+val1 <- log(2) + crossprod(mu, sigma) %*% x - d/2*log(2*pi) - log(gamma(shape)) - logk
+val2 <- p*log(Q(x, sigma)) - p*log(C(mu, sigma))
+val3 <- bessel_lnKnu(x = Q(x, sigma)*C(mu, sigma), nu = abs(p))
+
+val <- val1 + val2 + val3
+if(!log) val <- exp(val)
 
 attr(val, "terms") <- c(val1, val2, val3)
 return(val)
@@ -1128,6 +1177,8 @@ rmgl <- function(n, mu, sigma, shape = 1){
 # Kozubowski et al et (2013, Journal of Multivariate Analysis)
 # mu = symmetry
 # sigma = scale
+
+stopifnot(shape > 0)
 
     if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
         check.attributes = FALSE)) {
